@@ -7,7 +7,8 @@ graph TD
 
     subgraph Backend
         APIServer["APIServer (Django apiserver/)"]
-        RealtimeService["RealtimeService (Node.js/WebSocket live/)"]
+        Hocuspocus["Hocuspocus (Realtime Collaboration live/)"]
+        CeleryWorkers["Celery Workers (Background Tasks)"]
     end
 
     subgraph "Data Storage"
@@ -19,10 +20,15 @@ graph TD
 
     WebApp -- "API Calls (REST/GraphQL)" --> APIServer
     AdminApp -- "API Calls (REST/GraphQL)" --> APIServer
+    
     APIServer -- "Stores/Retrieves Data" --> Database
     APIServer -- "Caches Data" --> Cache
-    APIServer -- "Real-time Updates" --> RealtimeService
-    WebApp -- "Real-time Updates" --> RealtimeService
+    APIServer -- "Delegates Tasks" --> CeleryWorkers
+    CeleryWorkers -- "Updates Data (via APIServer or directly)" --> Database
+    CeleryWorkers -- "Uses Cache" --> Cache
+    
+    APIServer -- "Real-time Sync" --> Hocuspocus
+    WebApp -- "Real-time Collaboration" --> Hocuspocus
     
     WebApp -- "Uses Utilities/Types/UI" --> SharedPackages
     AdminApp -- "Uses Utilities/Types/UI" --> SharedPackages
